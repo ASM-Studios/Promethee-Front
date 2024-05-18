@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { ToastContainer } from "react-toastify";
 // @ts-ignore
 import background from '../assets/HomeBackground.png';
@@ -7,9 +7,22 @@ import deck from '../assets/deck.png';
 // @ts-ignore
 import board from '../assets/board.png';
 import UserContext from "../UserContext";
-import { useContext } from "react";
-import { useEffect, useState, useCallback } from "react";
+import {useContext, useEffect, useState } from "react";
 import { instance, draw, update } from "../routes";
+// @ts-ignore
+import card_1 from '../assets/card_1.png';
+// @ts-ignore
+import card_2 from '../assets/card_2.png';
+// @ts-ignore
+import card_3 from '../assets/card_3.png';
+// @ts-ignore
+import card_4 from '../assets/card_4.png';
+// @ts-ignore
+import card_5 from '../assets/card_5.png';
+// @ts-ignore
+import card_6 from '../assets/card_6.png';
+
+const cardsImages = [card_1, card_2, card_3, card_4, card_5, card_6];
 
 const getRandomColor = () => {
     const colors = [
@@ -31,6 +44,93 @@ const Game = () => {
         lobbyCreator,
         cards, setCards
     } = useContext(UserContext);
+    const [currentPlayer, setCurrentPlayer] = useState('');
+    const [focusedCard, setFocusedCard] = useState(-1);
+
+    const updatePlayers = () => {
+        return //TODO: Remove when route is implemented
+        instance.get(update, {
+            params: {
+                lobbyId: lobbyId
+            }
+        }).then((response) => {
+            setPlayers(response.data.players);
+            setCurrentPlayer(response.data.currentPlayer);
+        }).catch((error) => {
+            console.error(error);
+        });
+    };
+
+    useEffect(() => {
+        const interval = setInterval(updatePlayers, 10000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        while (cards.length < 3) {
+            instance.get(draw).then((response) => {
+                setCards([...cards, response.data.card]);
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
+    }, [cards, setCards]);
+
+    const CardsButtons = () => {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                    gap: '10px',
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        gap: '10px',
+                    }}
+                >
+                    <Button variant="contained" sx={{ flex: 1 }}>Jouer</Button>
+                    <Button variant="contained" sx={{ flex: 1 }}>Défausser</Button>
+                </Box>
+                <Button variant="contained" sx={{ width: '100%' }}>Parier</Button>
+            </Box>
+        );
+    };
+
+    const CardsLayout = () => {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '10px',
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '10px',
+                    }}
+                >
+                    {cards.slice(0, 2).map((card, index) => (
+                        <Button key={index} style={{backgroundImage: `url(${cardsImages[index]})`, backgroundSize: 'cover'}}>
+                        </Button>
+                    ))}
+                </Box>
+                {cards[2] && (
+                    <Button style={{backgroundImage: `url(${cardsImages[2]})`, backgroundSize: 'cover'}}>
+                    </Button>
+                )}
+            </Box>
+        );
+    };
 
     const GameLayout = () => {
         return (
@@ -38,19 +138,50 @@ const Game = () => {
                 <Box sx={{
                     flex: '1 1 auto',
                     backgroundImage: `url(${deck})`,
-                    backgroundSize: 'cover',
-                    padding: '20px',
-                    margin: '20px',
+                    backgroundSize: 'contain',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    marginRight: '10px',
+                    marginTop: '2%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    width: `362px`,
+                    minWidth: 0,
+                    minHeight: 0,
+                    transform: 'scaleY(0.9)'
                 }}>
                     {/* card box */}
-                    <></>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            height: '30%',
+                        }}
+                    >
+                        <CardsLayout/>
+                        <CardsButtons/>
+                    </Box>
                 </Box>
                 <Box sx={{
-                    flex: '1 1 66%',
+                    flex: '1 1 auto',
                     backgroundImage: `url(${board})`,
-                    backgroundSize: 'cover',
-                    padding: '20px',
-                    margin: '20px',
+                    backgroundSize: 'contain',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    marginLeft: '10px',
+                    marginTop: '2%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    width: `1152px`,
+                    minWidth: 0,
+                    minHeight: 0,
+                    transform: 'scaleY(0.9)'
                 }}>
                     {/* players box */}
                     <Box sx={{
@@ -80,22 +211,6 @@ const Game = () => {
                                         <Typography variant="h6" style={{color: 'white'}}>{username || 'null'}</Typography>
                                         <Typography variant="body1" style={{color: 'white'}}>🔥 {life || 'null'}</Typography>
                                     </Box>
-                                    <Box
-                                        sx={{
-                                            position: 'absolute',
-                                            right: 0,
-                                            top: 0,
-                                            width: '20px',
-                                            height: '20px',
-                                            backgroundColor: 'white',
-                                            color: 'black',
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            borderRadius: '50%',
-                                        }}
-                                    >
-                                    </Box>
                                 </>
                             );
                         })}
@@ -103,7 +218,7 @@ const Game = () => {
                 </Box>
             </Box>
         )
-    }
+    };
 
     return (
         <div style={{ position: 'relative', height: '100vh', width: '100vw' }}>
@@ -125,7 +240,7 @@ const Game = () => {
             </Box>
         </div>
     );
-}
+};
 
 
 export default Game;

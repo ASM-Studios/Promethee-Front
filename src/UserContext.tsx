@@ -9,8 +9,8 @@ type UserContextType = {
     setPlayers: (value: { [key: string]: number }) => void; // Updated setPlayers type
     lobbyCreator: string;
     setLobbyCreator: (value: string) => void;
-    cards: number[];
-    setCards: (value: number[]) => void;
+    cards: string[];
+    setCards: (value: string[]) => void;
 };
 
 const UserContext = createContext<UserContextType>({

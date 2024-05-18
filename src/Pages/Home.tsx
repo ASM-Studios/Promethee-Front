@@ -9,7 +9,7 @@ import UserContext from "../UserContext";
 import { enterLobbyById, instance } from "../routes";
 
 const Actions = () => {
-    const { username, lobbyId, setUsername, setLobbyId, setPlayers, setLobbyCreator } = useContext(UserContext);
+    const { username, lobbyId, setUsername, setLobbyId, setPlayers, setLobbyCreator, setCards } = useContext(UserContext);
 
     const launchGame = () => {
         if (username === '') {
@@ -93,7 +93,7 @@ const Actions = () => {
                         "player2": 15,
                         "player3": 10,
                     });
-
+                    setCards([1, 2, 5]);
                 }}
                 style={{ color: 'white', marginTop: '20px' }}
             >Debug</Button>

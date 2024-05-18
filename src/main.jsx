@@ -27,7 +27,14 @@ export default function App() {
         }
     });
     const [lobbyCreator, setLobbyCreator] = useState(localStorage.getItem('lobbyCreator') || '');
-    const [cards, setCards] = useState([]);
+    const [cards, setCards] = useState(() => {
+        try {
+            const storedCards = localStorage.getItem('cards');
+            return storedCards ? JSON.parse(storedCards) : [];
+        } catch {
+            return [];
+        }
+    });
 
     const setUsernameAndStore = (newUsername) => {
         setUsername(newUsername);
