@@ -1,6 +1,6 @@
 // @ts-ignore
 import PropTypes from 'prop-types';
-import { useState, useContext } from 'react';
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Button, TextField, CardContent } from '@mui/material';
 import { toast, ToastContainer } from "react-toastify";
@@ -20,7 +20,7 @@ const Actions = () => {
             toast.error('Veuillez renseigner un identifiant de partie');
             return;
         }
-        window.location.href = `/game/${lobbyId}`;
+        window.location.href = `/game`;
     }
 
     return (

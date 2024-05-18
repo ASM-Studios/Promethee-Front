@@ -6,6 +6,8 @@ import './index.css'
 import theme from "./Theme.tsx";
 
 import Home from "./Pages/Home.tsx";
+import Rules from "./Pages/Rules.tsx";
+import Game from "./Pages/Game.tsx";
 
 import { useState } from 'react';
 import UserContext from "./UserContext";
@@ -31,6 +33,8 @@ export default function App() {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Home />} />
+                        <Route path="/rules" element={<Rules />} />
+                        <Route path="/game" element={<Game />} />
                     </Routes>
                 </BrowserRouter>
             </ThemeProvider>
