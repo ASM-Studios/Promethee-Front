@@ -48,7 +48,6 @@ const Game = () => {
     const [focusedCard, setFocusedCard] = useState(-1);
 
     const updatePlayers = () => {
-        return //TODO: Remove when route is implemented
         instance.get(update, {
             params: {
                 lobbyId: lobbyId
@@ -61,23 +60,31 @@ const Game = () => {
         });
     };
 
-    useEffect(() => {
-        const interval = setInterval(updatePlayers, 10000);
+    // useEffect(() => {
+    //     const interval = setInterval(updatePlayers, 10000);
+    //
+    //     return () => clearInterval(interval);
+    // }, [updatePlayers]);
 
-        return () => clearInterval(interval);
-    }, []);
-
     useEffect(() => {
-        while (cards.length < 3) {
+        if (cards.length < 3)
             instance.get(draw).then((response) => {
-                setCards([...cards, response.data.card]);
+                setCards([...cards, response.data.value]);
             }).catch((error) => {
                 console.error(error);
             });
-        }
     }, [cards, setCards]);
 
     const CardsButtons = () => {
+        const discard = () => {
+            setCards(cards.filter((_, index) => index !== focusedCard));
+            setFocusedCard(-1);
+        };
+
+        const playCard = () => {
+
+        };
+
         return (
             <Box
                 sx={{
@@ -94,8 +101,8 @@ const Game = () => {
                         gap: '10px',
                     }}
                 >
-                    <Button variant="contained" sx={{ flex: 1 }}>Jouer</Button>
-                    <Button variant="contained" sx={{ flex: 1 }}>Défausser</Button>
+                    <Button variant="contained" sx={{ flex: 1 }} onClick={playCard}>Jouer</Button>
+                    <Button variant="contained" sx={{ flex: 1 }} onClick={discard}>Défausser</Button>
                 </Box>
                 <Button variant="contained" sx={{ width: '100%' }}>Parier</Button>
             </Box>
@@ -120,12 +127,19 @@ const Game = () => {
                     }}
                 >
                     {cards.slice(0, 2).map((card, index) => (
-                        <Button key={index} style={{backgroundImage: `url(${cardsImages[index]})`, backgroundSize: 'cover'}}>
+                        <Button
+                            key={index}
+                            style={{backgroundImage: `url(${cardsImages[index]})`, backgroundSize: 'cover'}}
+                            onClick={() => setFocusedCard(index)}
+                        >
                         </Button>
                     ))}
                 </Box>
                 {cards[2] && (
-                    <Button style={{backgroundImage: `url(${cardsImages[2]})`, backgroundSize: 'cover'}}>
+                    <Button
+                        style={{backgroundImage: `url(${cardsImages[2]})`, backgroundSize: 'cover'}}
+                        onClick={() => setFocusedCard(2)}
+                    >
                     </Button>
                 )}
             </Box>
