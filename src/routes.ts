@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 // @ts-ignore
-const port = import.meta.env.PORT;
+const edt = import.meta.env.VITE_ENDPOINT as string;
 // @ts-ignore
-const edt = import.meta.env.ENDPOINT;
+const port = import.meta.env.VITE_PORT as string;
+
 const endpoint = `http://${edt}:${port}`;
 
 const ping = endpoint + '/ping';

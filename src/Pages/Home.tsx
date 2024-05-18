@@ -1,15 +1,16 @@
 // @ts-ignore
 import PropTypes from 'prop-types';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Button, TextField, CardContent } from '@mui/material';
 import { toast, ToastContainer } from "react-toastify";
 // @ts-ignore
 import background from '../assets/HomeBackground.png';
 import UserContext from "../UserContext";
+import {enterLobbyById, instance, ping} from "../routes";
 
 const Actions = () => {
-    const { username, lobbyId, setUsername, setLobbyId } = useContext(UserContext);
+    const { username, lobbyId, setUsername, setLobbyId, setPlayers, setLobbyCreator } = useContext(UserContext);
 
     const launchGame = () => {
         if (username === '') {
@@ -20,7 +21,18 @@ const Actions = () => {
             toast.error('Veuillez renseigner un identifiant de partie');
             return;
         }
-        window.location.href = `/game`;
+        instance.post(enterLobbyById, {
+            username: username,
+            lobbyId: lobbyId
+        }).then((response) => {
+            setPlayers(response.data.users);
+            setLobbyId(response.data.lobbyId);
+            setLobbyCreator(response.data.creator);
+            window.location.href = '/game';
+        }).catch((error) => {
+            console.error(error);
+            toast.error('Impossible de rejoindre la partie');
+        });
     }
 
     return (
@@ -71,13 +83,6 @@ const Actions = () => {
             </Box>
         </Box>
     )
-};
-
-Actions.propTypes = {
-    username: PropTypes.string.isRequired,
-    setUname: PropTypes.func.isRequired,
-    lobbyId: PropTypes.string.isRequired,
-    setLId: PropTypes.func.isRequired,
 };
 
 const Home = () => {
