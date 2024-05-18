@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 // @ts-ignore
 import background from '../assets/HomeBackground.png';
 // @ts-ignore
@@ -8,26 +8,29 @@ import deck from '../assets/deck.png';
 import board from '../assets/board.png';
 import UserContext from "../UserContext";
 import { useContext } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { instance, draw, update } from "../routes";
 
 const getRandomColor = () => {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
-    return `rgb(${r}, ${g}, ${b})`;
+    const colors = [
+        'rgb(0, 120, 208)',
+        'rgb(255, 177, 20)',
+        'rgb(0, 166, 81)',
+        'rgb(240, 40, 45)',
+        'rgb(0, 0, 0)',
+    ];
+    const randomIndex = Math.floor(Math.random() * colors.length);
+    return colors[randomIndex];
 };
 
 const Game = () => {
-    const { username, lobbyId, players, lobbyCreator } = useContext(UserContext);
-    const [deckDimensions, setDeckDimensions] = useState({ width: 0, height: 0 });
-
-    useEffect(() => {
-        const img = new Image();
-        img.src = deck;
-        img.onload = () => {
-            setDeckDimensions({ width: img.naturalWidth, height: img.naturalHeight });
-        };
-    }, []);
+    const {
+        username,
+        lobbyId,
+        players, setPlayers,
+        lobbyCreator,
+        cards, setCards
+    } = useContext(UserContext);
 
     const GameLayout = () => {
         return (
@@ -40,6 +43,7 @@ const Game = () => {
                     margin: '20px',
                 }}>
                     {/* card box */}
+                    <></>
                 </Box>
                 <Box sx={{
                     flex: '1 1 66%',
@@ -56,42 +60,42 @@ const Game = () => {
                         height: '100%',
                         position: 'relative',
                     }}>
-                        {players.map((player, index) => {
+                        {players.map(({username, life}, index) => {
                             const rotation = (360 / players.length) * index;
 
                             return (
                                 <>
-                                <Box
-                                    key={index}
-                                    sx={{
-                                        position: 'absolute',
-                                        transform: `rotate(${rotation}deg) translate(300px) rotate(-${rotation}deg)`,
-                                        backgroundColor: getRandomColor(),
-                                        borderRadius: '20px',
-                                        padding: '20px',
-                                        width: `20ch`,
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    <Typography variant="h6" style={{color: 'white'}}>{player}</Typography>
-                                        <Typography variant="body1" style={{color: 'white'}}>🔥 20</Typography>
+                                    <Box
+                                        key={index}
+                                        sx={{
+                                            position: 'absolute',
+                                            transform: `rotate(${rotation}deg) translate(300px) rotate(-${rotation}deg)`,
+                                            backgroundColor: getRandomColor(),
+                                            borderRadius: '20px',
+                                            padding: '20px',
+                                            width: `25ch`,
+                                            textAlign: 'center'
+                                        }}
+                                    >
+                                        <Typography variant="h6" style={{color: 'white'}}>{username || 'null'}</Typography>
+                                        <Typography variant="body1" style={{color: 'white'}}>🔥 {life || 'null'}</Typography>
                                     </Box>
-                                <Box
-                                    sx={{
-                                        position: 'absolute',
-                                        right: 0,
-                                        top: 0,
-                                        width: '20px',
-                                        height: '20px',
-                                        backgroundColor: 'white',
-                                        color: 'black',
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        borderRadius: '50%',
-                                    }}
-                                >
-                                </Box>
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            right: 0,
+                                            top: 0,
+                                            width: '20px',
+                                            height: '20px',
+                                            backgroundColor: 'white',
+                                            color: 'black',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            borderRadius: '50%',
+                                        }}
+                                    >
+                                    </Box>
                                 </>
                             );
                         })}

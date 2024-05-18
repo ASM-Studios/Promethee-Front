@@ -10,7 +10,7 @@ const endpoint = `http://${edt}:${port}`;
 const ping = endpoint + '/ping';
 const enterLobbyById = endpoint + '/enter_lobby_by_id';
 const playCard = endpoint + '/play_card';
-const updateByUsername = endpoint + '/update_by_username';
+const update = endpoint + '/update';
 const draw = endpoint + '/draw';
 const question = endpoint + '/question';
 
@@ -28,7 +28,7 @@ export {
     ping,
     enterLobbyById,
     playCard,
-    updateByUsername,
+    update,
     draw,
     question,
 };

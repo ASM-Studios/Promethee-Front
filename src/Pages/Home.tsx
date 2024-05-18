@@ -24,7 +24,7 @@ const Actions = () => {
             username: username,
             lobbyId: lobbyId
         }).then((response) => {
-            setPlayers(response.data.users);
+            setPlayers(response.data.players);
             setLobbyId(response.data.lobbyId);
             setLobbyCreator(response.data.creator);
             window.location.href = '/game';
@@ -40,7 +40,7 @@ const Actions = () => {
             <CardContent>
                 <Box sx={{ padding: 2, margin: 2 }}>
                     <Box sx={{ paddingBottom: 2 }}>
-                        <h1 style={{ color: 'white' }}>🔥 Promethée</h1>
+                        <h1 style={{ color: 'white' }}>🔥 PROMÉTHÉE 🔥</h1>
                     </Box>
                     <Box sx={{ paddingBottom: 2 }}>
                         <TextField
@@ -84,6 +84,28 @@ const Actions = () => {
                 </Box>
             </CardContent>
             </Box>
+
+            <Button
+                variant="contained"
+                onClick={() => {
+                    setPlayers({
+                        "player1": 20,
+                        "player2": 15,
+                        "player3": 10,
+                    });
+
+                }}
+                style={{ color: 'white', marginTop: '20px' }}
+            >Debug</Button>
+            <Button
+                variant="contained"
+                onClick={() => {
+                    localStorage.clear();
+                    window.location.reload();
+                }}
+                style={{ color: 'white', marginTop: '20px' }}
+            >Clear Cache</Button>
+
         </Box>
     )
 };

@@ -5,10 +5,12 @@ type UserContextType = {
     setUsername: (value: string) => void;
     lobbyId: string;
     setLobbyId: (value: string) => void;
-    players: string[];
-    setPlayers: (value: string[]) => void;
+    players: { [key: string]: number }; // Updated players type
+    setPlayers: (value: { [key: string]: number }) => void; // Updated setPlayers type
     lobbyCreator: string;
     setLobbyCreator: (value: string) => void;
+    cards: number[];
+    setCards: (value: number[]) => void;
 };
 
 const UserContext = createContext<UserContextType>({
@@ -16,10 +18,12 @@ const UserContext = createContext<UserContextType>({
     setUsername: () => {},
     lobbyId: '',
     setLobbyId: () => {},
-    players: [],
+    players: {},
     setPlayers: () => {},
     lobbyCreator: '',
     setLobbyCreator: () => {},
+    cards: [],
+    setCards: () => {},
 });
 
 export default UserContext;

@@ -21,12 +21,13 @@ export default function App() {
     const [players, setPlayers] = useState(() => {
         try {
             const storedPlayers = localStorage.getItem('players');
-            return storedPlayers ? JSON.parse(storedPlayers) : [];
+            return storedPlayers ? JSON.parse(storedPlayers) : {};
         } catch {
-            return [];
+            return {};
         }
     });
     const [lobbyCreator, setLobbyCreator] = useState(localStorage.getItem('lobbyCreator') || '');
+    const [cards, setCards] = useState([]);
 
     const setUsernameAndStore = (newUsername) => {
         setUsername(newUsername);
@@ -48,12 +49,18 @@ export default function App() {
         localStorage.setItem('lobbyCreator', newLobbyCreator);
     }
 
+    const setCardsAndStore = (newCards) => {
+        setCards(newCards);
+        localStorage.setItem('cards', JSON.stringify(newCards));
+    }
+
     return (
         <UserContext.Provider value={{
-                username, setUsername: setUsernameAndStore,
-                lobbyId, setLobbyId: setLobbyIdAndStore,
-                players, setPlayers: setPlayersAndStore,
-                lobbyCreator, setLobbyCreator: setLobbyCreatorAndStore,
+            username, setUsername: setUsernameAndStore,
+            lobbyId, setLobbyId: setLobbyIdAndStore,
+            players, setPlayers: setPlayersAndStore,
+            lobbyCreator, setLobbyCreator: setLobbyCreatorAndStore,
+            cards, setCards: setCardsAndStore,
         }}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
