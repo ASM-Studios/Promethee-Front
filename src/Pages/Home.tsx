@@ -1,13 +1,12 @@
 // @ts-ignore
-import PropTypes from 'prop-types';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Button, TextField, CardContent } from '@mui/material';
 import { toast, ToastContainer } from "react-toastify";
 // @ts-ignore
 import background from '../assets/HomeBackground.png';
 import UserContext from "../UserContext";
-import {enterLobbyById, instance, ping} from "../routes";
+import { enterLobbyById, instance } from "../routes";
 
 const Actions = () => {
     const { username, lobbyId, setUsername, setLobbyId, setPlayers, setLobbyCreator } = useContext(UserContext);
@@ -47,8 +46,12 @@ const Actions = () => {
                         <TextField
                             label="pseudo"
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            fullWidth
+                            onChange={(e) => {
+                                const newValue = e.target.value;
+                                if (newValue.length <= 20) {
+                                    setUsername(newValue);
+                                }
+                            }}                            fullWidth
                             InputProps={{ style: { color: 'white' } }}
                             InputLabelProps={{ style: { color: 'white' } }}
                         />

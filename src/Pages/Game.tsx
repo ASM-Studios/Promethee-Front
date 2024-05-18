@@ -60,11 +60,12 @@ const Game = () => {
                             const rotation = (360 / players.length) * index;
 
                             return (
+                                <>
                                 <Box
                                     key={index}
                                     sx={{
                                         position: 'absolute',
-                                        transform: `rotate(${rotation}deg) translate(200px) rotate(-${rotation}deg)`,
+                                        transform: `rotate(${rotation}deg) translate(300px) rotate(-${rotation}deg)`,
                                         backgroundColor: getRandomColor(),
                                         borderRadius: '20px',
                                         padding: '20px',
@@ -73,7 +74,25 @@ const Game = () => {
                                     }}
                                 >
                                     <Typography variant="h6" style={{color: 'white'}}>{player}</Typography>
+                                        <Typography variant="body1" style={{color: 'white'}}>🔥 20</Typography>
+                                    </Box>
+                                <Box
+                                    sx={{
+                                        position: 'absolute',
+                                        right: 0,
+                                        top: 0,
+                                        width: '20px',
+                                        height: '20px',
+                                        backgroundColor: 'white',
+                                        color: 'black',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderRadius: '50%',
+                                    }}
+                                >
                                 </Box>
+                                </>
                             );
                         })}
                     </Box>
