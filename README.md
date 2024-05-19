@@ -16,6 +16,11 @@ npm install
 npm run dev
 ```
 
+## Backend
+
+The backend of the project is a python flask server.<br>
+You can find the repository [here](https://github.com/ASM-Studios/Promethee-Back)
+
 ## Rules
 
 Each player wait for his turn to play.<br>
