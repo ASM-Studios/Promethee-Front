@@ -92,6 +92,8 @@ const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCard
                 flexDirection: 'column',
                 alignItems: 'stretch',
                 gap: '10px',
+                marginTop: '2vw',
+                width: '15vw',
             }}
         >
             <Box
@@ -197,7 +199,10 @@ const Game = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '10px',
+                    width: '100%',
+                    height: '100%',
                 }}
             >
                 <Box
@@ -212,8 +217,14 @@ const Game = () => {
                             key={index}
                             style={{
                                 backgroundImage: `url(${cardsImages[index]})`,
-                                backgroundSize: 'cover',
-                                border: focusedCard === index ? '3px solid red' : 'none'
+                                backgroundSize: 'contain',
+                                backgroundPosition: 'center',
+                                backgroundRepeat: 'no-repeat',
+                                width: '8vw',
+                                height: '13vw',
+                                border: 'none',
+                                borderRadius: '10px',
+                                boxShadow: focusedCard === index ? 'inset 0 0 0 3px red' : 'none',
                             }}
                             onClick={() => setFocusedCard(index)}
                             disabled={ currentPlayer !== username || asDraw }
@@ -233,8 +244,14 @@ const Game = () => {
                             key={index+2}
                             style={{
                                 backgroundImage: `url(${cardsImages[index+2]})`,
-                                backgroundSize: 'cover',
-                                border: focusedCard === (index + 2) ? '3px solid red' : 'none'
+                                backgroundSize: 'contain',
+                                backgroundPosition: 'center',
+                                backgroundRepeat: 'no-repeat',
+                                width: '8vw',
+                                height: '13vw',
+                                border: 'none',
+                                borderRadius: '10px',
+                                boxShadow: focusedCard === (index + 2) ? 'inset 0 0 0 3px red' : 'none',
                             }}
                             onClick={() => setFocusedCard(index + 2)}
                             disabled={ currentPlayer !== username || asDraw }
@@ -283,6 +300,7 @@ const Game = () => {
                     backgroundSize: 'contain',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
+                    marginLeft: '20px',
                     marginRight: '10px',
                     marginTop: '2%',
                     display: 'flex',
@@ -301,7 +319,8 @@ const Game = () => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            height: '30%',
+                            marginTop: '5vw',
+                            padding: '2vw',
                         }}
                     >
                         <CardsLayout/>
@@ -331,6 +350,7 @@ const Game = () => {
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     marginLeft: '10px',
+                    marginRight: '20px',
                     marginTop: '2%',
                     display: 'flex',
                     justifyContent: 'center',
@@ -357,11 +377,12 @@ const Game = () => {
                                     key={index}
                                     sx={{
                                         position: 'absolute',
-                                        transform: `rotate(${rotation}deg) translate(300px) rotate(-${rotation}deg)`,
+                                        transform: `rotate(${rotation}deg) translate(15vw) rotate(-${rotation}deg)`,
                                         backgroundColor: getRandomColor(),
                                         borderRadius: '20px',
-                                        padding: '20px',
-                                        width: `25ch`,
+                                        marginTop: '5vw',
+                                        padding: '2vw',
+                                        width: `10vw`,
                                         textAlign: 'center',
                                         border: target === username ? '3px solid red' : 'none'
                                     }}
