@@ -12,7 +12,8 @@ const enterLobbyById = endpoint + '/enter_lobby_by_id';
 const playCard = endpoint + '/play_card';
 const update = endpoint + '/update';
 const draw = endpoint + '/draw';
-const question = endpoint + '/question';
+const questionUrl = endpoint + '/question';
+const endOfTurn = endpoint + '/end_of_turn';
 
 const instance = axios.create({
     baseURL: endpoint,
@@ -30,5 +31,6 @@ export {
     playCard,
     update,
     draw,
-    question,
+    questionUrl,
+    endOfTurn,
 };

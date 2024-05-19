@@ -1,5 +1,4 @@
-import { Box, Typography, Button } from '@mui/material';
-import { ToastContainer } from "react-toastify";
+import { Box, Typography, Button, Modal, Slider } from '@mui/material';
 // @ts-ignore
 import background from '../assets/HomeBackground.png';
 // @ts-ignore
@@ -7,8 +6,9 @@ import deck from '../assets/deck.png';
 // @ts-ignore
 import board from '../assets/board.png';
 import UserContext from "../UserContext";
-import {useContext, useEffect, useState } from "react";
-import { instance, draw, update } from "../routes";
+// @ts-ignore
+import React, { useContext, useEffect, useState, useCallback } from "react";
+import { instance, draw, update, playCard, endOfTurn, questionUrl } from "../routes";
 // @ts-ignore
 import card_1 from '../assets/card_1.png';
 // @ts-ignore
@@ -25,16 +25,90 @@ import card_6 from '../assets/card_6.png';
 const cardsImages = [card_1, card_2, card_3, card_4, card_5, card_6];
 
 const getRandomColor = () => {
-    const colors = [
-        'rgb(0, 120, 208)',
-        'rgb(255, 177, 20)',
-        'rgb(0, 166, 81)',
-        'rgb(240, 40, 45)',
-        'rgb(0, 0, 0)',
-    ];
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    return `rgb(${r}, ${g}, ${b})`;
 };
+
+const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCards, cards, setFocusedCard, endTurn, lobbyId, username, target, setQuestion, setIsQuestion, setSliderValue }) => {
+    const discard = () => {
+        setCards(cards.filter((_, index) => index !== focusedCard));
+        setFocusedCard(-1);
+        endTurn();
+    };
+
+    const playCardF = () => {
+        instance.post(playCard, {
+            lobbyId: lobbyId,
+            username: username,
+            value: cards[focusedCard],
+            action: target !== username ? 'damage' : 'heal',
+            target: target !== username ? target : ''
+        }).then(() => {
+            discard();
+        }).catch((error) => {
+            console.error(error);
+        });
+    };
+
+    const gamble = () => {
+        instance.put(questionUrl, {
+            lobbyId: lobbyId,
+            username: username,
+        }).then((response) => {
+            setQuestion({
+                title: response.data.title,
+                expected: response.data.expected,
+                min: response.data.min,
+                max: response.data.max,
+                tolerance: response.data.tolerance,
+            });
+            setIsQuestion(true);
+            setSliderValue(response.data.min)
+        }).catch((error) => {
+            console.error(error);
+        });
+    };
+
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                gap: '10px',
+            }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: '10px',
+                }}
+            >
+                <Button
+                    variant="contained"
+                    sx={{ flex: 1 }}
+                    onClick={ playCardF }
+                    disabled={ currentPlayer !== username || focusedCard == -1 }
+                >Jouer</Button>
+                <Button
+                    variant="contained"
+                    sx={{ flex: 1 }}
+                    onClick={ discard }
+                    disabled={ currentPlayer !== username || focusedCard == -1 }
+                >Défausser</Button>
+            </Box>
+            <Button
+                variant="contained"
+                sx={{ width: '100%' }}
+                onClick={ gamble }
+                disabled={ asGamble || (currentPlayer !== username || focusedCard == -1) }
+            >Parier</Button>
+        </Box>
+    );
+});
 
 const Game = () => {
     const {
@@ -44,27 +118,37 @@ const Game = () => {
         lobbyCreator,
         cards, setCards
     } = useContext(UserContext);
-    const [currentPlayer, setCurrentPlayer] = useState('');
+    const [currentPlayer, setCurrentPlayer] = useState(lobbyCreator);
     const [focusedCard, setFocusedCard] = useState(-1);
+    const [target, setTarget] = useState('');
+    const [question, setQuestion] = useState(
+        {
+            title: '',
+            expected: 0,
+            min: 0,
+            max: 0,
+            tolerance: 0,
+        }
+    );
+    const [isQuestion, setIsQuestion] = useState(false);
+    const [sliderValue, setSliderValue] = useState(question.min);
 
-    const updatePlayers = () => {
-        instance.get(update, {
-            params: {
-                lobbyId: lobbyId
-            }
+    const updatePlayers = useCallback(() => {
+        instance.put(update, {
+            lobbyId: lobbyId
         }).then((response) => {
             setPlayers(response.data.players);
             setCurrentPlayer(response.data.currentPlayer);
         }).catch((error) => {
             console.error(error);
         });
-    };
+    }, [lobbyId, setPlayers]);
 
-    // useEffect(() => {
-    //     const interval = setInterval(updatePlayers, 10000);
-    //
-    //     return () => clearInterval(interval);
-    // }, [updatePlayers]);
+    useEffect(() => {
+        const interval = setInterval(updatePlayers, (import.meta.env.VITE_REFRESH_INTERVAL) || 10000);
+
+        return () => clearInterval(interval);
+    }, [updatePlayers]);
 
     useEffect(() => {
         if (cards.length < 3)
@@ -75,39 +159,15 @@ const Game = () => {
             });
     }, [cards, setCards]);
 
-    const CardsButtons = () => {
-        const discard = () => {
-            setCards(cards.filter((_, index) => index !== focusedCard));
-            setFocusedCard(-1);
-        };
-
-        const playCard = () => {
-
-        };
-
-        return (
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'stretch',
-                    gap: '10px',
-                }}
-            >
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        gap: '10px',
-                    }}
-                >
-                    <Button variant="contained" sx={{ flex: 1 }} onClick={playCard}>Jouer</Button>
-                    <Button variant="contained" sx={{ flex: 1 }} onClick={discard}>Défausser</Button>
-                </Box>
-                <Button variant="contained" sx={{ width: '100%' }}>Parier</Button>
-            </Box>
-        );
-    };
+    const endTurn = () => {
+        instance.put(endOfTurn, {
+            lobbyId: lobbyId
+        }).then(() => {
+            updatePlayers();
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
 
     const CardsLayout = () => {
         return (
@@ -135,16 +195,43 @@ const Game = () => {
                         </Button>
                     ))}
                 </Box>
-                {cards[2] && (
-                    <Button
-                        style={{backgroundImage: `url(${cardsImages[2]})`, backgroundSize: 'cover'}}
-                        onClick={() => setFocusedCard(2)}
-                    >
-                    </Button>
-                )}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '10px',
+                    }}
+                >
+                    {cards.slice(2, 4).map((card, index) => (
+                        <Button
+                            key={index+2}
+                            style={{backgroundImage: `url(${cardsImages[index+2]})`, backgroundSize: 'cover'}}
+                            onClick={() => setFocusedCard(index + 2)}
+                        >
+                        </Button>
+                    ))}
+                </Box>
             </Box>
         );
     };
+
+    const validateQuestion = (question: { expected: number; tolerance: number; }, answer: number, setIsQuestion: (arg0: boolean) => void) => {
+        const min = question.expected - question.tolerance;
+        const max = question.expected + question.tolerance;
+        if (answer >= min && answer <= max) {
+            setCards([...cards, cards[focusedCard]]);
+        }
+        setIsQuestion(false);
+    };
+
+    const hasPlayerGamble = (players: { [key: string]: number; }, username: string) => {
+        // @ts-ignore
+        for (const player of players) {
+            if (player.username === username) {
+                return player.asGamble;
+            }
+        }
+    }
 
     const GameLayout = () => {
         return (
@@ -177,7 +264,21 @@ const Game = () => {
                         }}
                     >
                         <CardsLayout/>
-                        <CardsButtons/>
+                        <CardsButtons
+                            currentPlayer={currentPlayer}
+                            focusedCard={focusedCard}
+                            asGamble={hasPlayerGamble(players, username)}
+                            setCards={setCards}
+                            cards={cards}
+                            setFocusedCard={setFocusedCard}
+                            endTurn={endTurn}
+                            lobbyId={lobbyId}
+                            username={username}
+                            target={target}
+                            setQuestion={setQuestion}
+                            setIsQuestion={setIsQuestion}
+                            setSliderValue={setSliderValue}
+                        />
                     </Box>
                 </Box>
                 <Box sx={{
@@ -209,34 +310,80 @@ const Game = () => {
                             const rotation = (360 / players.length) * index;
 
                             return (
-                                <>
-                                    <Box
-                                        key={index}
-                                        sx={{
-                                            position: 'absolute',
-                                            transform: `rotate(${rotation}deg) translate(300px) rotate(-${rotation}deg)`,
-                                            backgroundColor: getRandomColor(),
-                                            borderRadius: '20px',
-                                            padding: '20px',
-                                            width: `25ch`,
-                                            textAlign: 'center'
-                                        }}
-                                    >
-                                        <Typography variant="h6" style={{color: 'white'}}>{username || 'null'}</Typography>
-                                        <Typography variant="body1" style={{color: 'white'}}>🔥 {life || 'null'}</Typography>
-                                    </Box>
-                                </>
+                                <Button
+                                    key={index}
+                                    sx={{
+                                        position: 'absolute',
+                                        transform: `rotate(${rotation}deg) translate(300px) rotate(-${rotation}deg)`,
+                                        backgroundColor: getRandomColor(),
+                                        borderRadius: '20px',
+                                        padding: '20px',
+                                        width: `25ch`,
+                                        textAlign: 'center'
+                                    }}
+                                    onClick={() => setTarget(username)}
+                                >
+                                    <Typography variant="h6" style={{color: 'white'}}>
+                                        {username || 'null'}
+                                        <br />
+                                        🔥 {life || 'null'}
+                                    </Typography>
+                                </Button>
                             );
                         })}
                     </Box>
                 </Box>
+                {/* @ts-ignore */}
+                <Modal
+                    open={isQuestion}
+                    onClose={() => {}}
+                    disableEscapeKeyDown
+                    disableBackdropClick
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: 400,
+                            bgcolor: 'white',
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: '10px',
+                        }}
+                    >
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            {question.title}
+                        </Typography>
+                        <Slider
+                            aria-label="Question slider"
+                            defaultValue={question.min}
+                            value={sliderValue}
+                            onChangeCommitted={(event, newValue) => setSliderValue(newValue)}
+                            valueLabelDisplay="auto"
+                            step={1}
+                            min={question.min}
+                            max={question.max}
+                        />
+                        <Button onClick={() => validateQuestion(
+                            {
+                                expected: question.expected,
+                                tolerance: question.tolerance,
+                            },
+                            sliderValue,
+                            setIsQuestion
+                        )}>Répondre</Button>
+                    </Box>
+                </Modal>
             </Box>
         )
     };
 
     return (
         <div style={{ position: 'relative', height: '100vh', width: '100vw' }}>
-            <ToastContainer />
             <div style={{
                 position: 'absolute',
                 top: 0,

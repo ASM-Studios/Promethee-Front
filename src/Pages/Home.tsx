@@ -2,7 +2,6 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Button, TextField, CardContent } from '@mui/material';
-import { toast, ToastContainer } from "react-toastify";
 // @ts-ignore
 import background from '../assets/HomeBackground.png';
 import UserContext from "../UserContext";
@@ -12,14 +11,10 @@ const Actions = () => {
     const { username, lobbyId, setUsername, setLobbyId, setPlayers, setLobbyCreator, setCards } = useContext(UserContext);
 
     const launchGame = () => {
-        if (username === '') {
-            toast.error('Veuillez renseigner un pseudo');
+        if (username === '')
             return;
-        }
-        if (lobbyId === '') {
-            toast.error('Veuillez renseigner un identifiant de partie');
+        if (lobbyId === '')
             return;
-        }
         instance.post(enterLobbyById, {
             username: username,
             lobbyId: lobbyId
@@ -30,7 +25,6 @@ const Actions = () => {
             window.location.href = '/game';
         }).catch((error) => {
             console.error(error);
-            toast.error('Impossible de rejoindre la partie');
         });
     }
 
@@ -84,28 +78,6 @@ const Actions = () => {
                 </Box>
             </CardContent>
             </Box>
-
-            <Button
-                variant="contained"
-                onClick={() => {
-                    setPlayers({
-                        "player1": 20,
-                        "player2": 15,
-                        "player3": 10,
-                    });
-                    setCards([1, 2, 5]);
-                }}
-                style={{ color: 'white', marginTop: '20px' }}
-            >Debug</Button>
-            <Button
-                variant="contained"
-                onClick={() => {
-                    localStorage.clear();
-                    window.location.reload();
-                }}
-                style={{ color: 'white', marginTop: '20px' }}
-            >Clear Cache</Button>
-
         </Box>
     )
 };
@@ -113,7 +85,6 @@ const Actions = () => {
 const Home = () => {
     return (
         <div style={{ position: 'relative', height: '100vh', width: '100vw' }}>
-            <ToastContainer />
             <div style={{
                 position: 'absolute',
                 top: 0,

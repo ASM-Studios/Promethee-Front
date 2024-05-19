@@ -4,7 +4,7 @@ import HomeIcon from '@mui/icons-material/Home';
 
 const Header = () => {
     const allow = [
-        '/game', //TODO: Revert to '/game'
+        '/game',
     ]
 
     return (
