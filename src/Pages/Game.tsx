@@ -31,18 +31,33 @@ const getRandomColor = () => {
     return `rgb(${r}, ${g}, ${b})`;
 };
 
-const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCards, cards, setFocusedCard, endTurn, lobbyId, username, target, setQuestion, setIsQuestion, setSliderValue }) => {
+const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCards, cards, setFocusedCard, endTurn, lobbyId, username, target, setQuestion, setIsQuestion, setSliderValue, asDraw, setAsDraw }) => {
+
     const discard = () => {
         setCards(cards.filter((_, index) => index !== focusedCard));
         setFocusedCard(-1);
+        setAsDraw(false);
         endTurn();
     };
 
+    const drawCard = () => {
+        setAsDraw(true);
+        setCards(cards.filter((_, index) => index !== focusedCard));
+        instance.get(draw).then((response) => {
+            setCards([...cards, response.data.value]);
+            setAsDraw(true);
+            setFocusedCard(cards.length - 1);
+        }).catch((error) => {
+            console.error(error);
+        });
+    };
+
     const playCardF = () => {
+        console.log("value: ", cards[focusedCard])
         instance.post(playCard, {
-            lobbyId: lobbyId,
-            username: username,
-            value: cards[focusedCard],
+            lobbyId: lobbyId || '',
+            username: username || '',
+            value: cards[focusedCard] || 0,
             action: target !== username ? 'damage' : 'heal',
             target: target !== username ? target : ''
         }).then(() => {
@@ -96,8 +111,8 @@ const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCard
                 <Button
                     variant="contained"
                     sx={{ flex: 1 }}
-                    onClick={ discard }
-                    disabled={ currentPlayer !== username || focusedCard == -1 }
+                    onClick={ drawCard }
+                    disabled={ currentPlayer !== username || focusedCard == -1 || asDraw }
                 >Défausser</Button>
             </Box>
             <Button
@@ -106,6 +121,12 @@ const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCard
                 onClick={ gamble }
                 disabled={ asGamble || (currentPlayer !== username || focusedCard == -1) }
             >Parier</Button>
+            <Button
+                variant="contained"
+                sx={{ width: '100%' }}
+                onClick={ endTurn }
+                disabled={ currentPlayer !== username }
+            >Terminer le tour</Button>
         </Box>
     );
 });
@@ -132,6 +153,7 @@ const Game = () => {
     );
     const [isQuestion, setIsQuestion] = useState(false);
     const [sliderValue, setSliderValue] = useState(question.min);
+    const [asDraw, setAsDraw] = useState(false);
 
     const updatePlayers = useCallback(() => {
         instance.put(update, {
@@ -189,8 +211,13 @@ const Game = () => {
                     {cards.slice(0, 2).map((card, index) => (
                         <Button
                             key={index}
-                            style={{backgroundImage: `url(${cardsImages[index]})`, backgroundSize: 'cover'}}
+                            style={{
+                                backgroundImage: `url(${cardsImages[index]})`,
+                                backgroundSize: 'cover',
+                                border: focusedCard === index ? '3px solid red' : 'none'
+                            }}
                             onClick={() => setFocusedCard(index)}
+                            disabled={ currentPlayer !== username || asDraw }
                         >
                         </Button>
                     ))}
@@ -205,8 +232,13 @@ const Game = () => {
                     {cards.slice(2, 4).map((card, index) => (
                         <Button
                             key={index+2}
-                            style={{backgroundImage: `url(${cardsImages[index+2]})`, backgroundSize: 'cover'}}
+                            style={{
+                                backgroundImage: `url(${cardsImages[index+2]})`,
+                                backgroundSize: 'cover',
+                                border: focusedCard === (index + 2) ? '3px solid red' : 'none'
+                            }}
                             onClick={() => setFocusedCard(index + 2)}
+                            disabled={ currentPlayer !== username || asDraw }
                         >
                         </Button>
                     ))}
@@ -278,6 +310,8 @@ const Game = () => {
                             setQuestion={setQuestion}
                             setIsQuestion={setIsQuestion}
                             setSliderValue={setSliderValue}
+                            asDraw={asDraw}
+                            setAsDraw={setAsDraw}
                         />
                     </Box>
                 </Box>
@@ -319,7 +353,8 @@ const Game = () => {
                                         borderRadius: '20px',
                                         padding: '20px',
                                         width: `25ch`,
-                                        textAlign: 'center'
+                                        textAlign: 'center',
+                                        border: target === username ? '3px solid red' : 'none'
                                     }}
                                     onClick={() => setTarget(username)}
                                 >
