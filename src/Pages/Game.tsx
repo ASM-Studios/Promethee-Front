@@ -53,7 +53,6 @@ const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCard
     };
 
     const playCardF = () => {
-        console.log("value: ", cards[focusedCard])
         instance.post(playCard, {
             lobbyId: lobbyId || '',
             username: username || '',
@@ -252,6 +251,16 @@ const Game = () => {
         const max = question.expected + question.tolerance;
         if (answer >= min && answer <= max) {
             setCards([...cards, cards[focusedCard]]);
+        } else {
+            instance.post(playCard, {
+                lobbyId: lobbyId || '',
+                username: username || '',
+                value: parseInt(cards[focusedCard]) * 2 || 6,
+                action: 'damage',
+                target: username || ''
+            }).catch((error) => {
+                console.error(error);
+            });
         }
         setIsQuestion(false);
     };

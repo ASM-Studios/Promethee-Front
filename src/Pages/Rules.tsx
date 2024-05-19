@@ -96,8 +96,8 @@ const Rules = () => {
         createGameCard("Parier", [
             <ListItemBlue>Le mécanisme de pari est au cœur de l'action du jeu.</ListItemBlue>,
             <ListItemYellow>Chaque joueur peut appeler un pari une fois par match.</ListItemYellow>,
-            <ListItemWhite>Lorsqu'il mise, tous les joueurs doivent choisir une carte de leur main et la jouer face cachée.</ListItemWhite>,
-            <ListItemGreen>Après la sélection, une question est posée à tous les joueurs. Selon la réponse : Le joueur répond correctement : La carte misée est retournée dans la main du joueur, et il peut jouer une nouvelle carte avec la même valeur. Le joueur répond incorrectement : La carte misée est défausser et le joueur subit 2 fois la valeur de la carte en dégâts.</ListItemGreen>,
+            <ListItemWhite>Lorsqu'il mise, le joueur doit choisir une carte de sa main et la jouer face cachée.</ListItemWhite>,
+            <ListItemGreen>Après la sélection, une question est posée au joueur. Selon la réponse : Le joueur répond correctement : La carte misée est retournée dans la main du joueur, et il peut jouer une nouvelle carte avec la même valeur. Le joueur répond incorrectement : La carte misée est défausser et le joueur subit 2 fois la valeur de la carte en dégâts.</ListItemGreen>,
             <ListItemRed>Lorsqu'un joueur appelle un pari, cela ne met pas fin à son tour.</ListItemRed>
         ])
     ];
