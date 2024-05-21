@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Modal, Slider } from '@mui/material';
+import {Box, Typography, Button, Modal, Slider, IconButton} from '@mui/material';
 // @ts-ignore
 import background from '../assets/HomeBackground.png';
 // @ts-ignore
@@ -21,6 +21,7 @@ import card_4 from '../assets/card_4.png';
 import card_5 from '../assets/card_5.png';
 // @ts-ignore
 import card_6 from '../assets/card_6.png';
+import HomeIcon from "@mui/icons-material/Home";
 
 const cardsImages = [card_1, card_2, card_3, card_4, card_5, card_6];
 
@@ -31,7 +32,7 @@ const getRandomColor = () => {
     return `rgb(${r}, ${g}, ${b})`;
 };
 
-const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCards, cards, setFocusedCard, endTurn, lobbyId, username, target, setQuestion, setIsQuestion, setSliderValue, asDraw, setAsDraw }) => {
+const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCards, cards, setFocusedCard, endTurn, lobbyId, username, target, setQuestion, setIsQuestion, setSliderValue, asDraw, setAsDraw, isDead }) => {
 
     const discard = () => {
         setCards(cards.filter((_, index) => index !== focusedCard));
@@ -107,26 +108,26 @@ const CardsButtons = React.memo(({ currentPlayer, focusedCard, asGamble, setCard
                     variant="contained"
                     sx={{ flex: 1 }}
                     onClick={ playCardF }
-                    disabled={ currentPlayer !== username || focusedCard == -1 }
+                    disabled={ currentPlayer !== username || focusedCard == -1 || isDead }
                 >Jouer</Button>
                 <Button
                     variant="contained"
                     sx={{ flex: 1 }}
                     onClick={ drawCard }
-                    disabled={ currentPlayer !== username || focusedCard == -1 || asDraw }
+                    disabled={ currentPlayer !== username || focusedCard == -1 || asDraw || isDead }
                 >Défausser</Button>
             </Box>
             <Button
                 variant="contained"
                 sx={{ width: '100%' }}
                 onClick={ gamble }
-                disabled={ asGamble || (currentPlayer !== username || focusedCard == -1) }
+                disabled={ asGamble || (currentPlayer !== username || focusedCard == -1) || isDead }
             >Parier</Button>
             <Button
                 variant="contained"
                 sx={{ width: '100%' }}
                 onClick={ endTurn }
-                disabled={ currentPlayer !== username }
+                disabled={ currentPlayer !== username || isDead }
             >Terminer le tour</Button>
         </Box>
     );
@@ -155,6 +156,7 @@ const Game = () => {
     const [isQuestion, setIsQuestion] = useState(false);
     const [sliderValue, setSliderValue] = useState(question.min);
     const [asDraw, setAsDraw] = useState(false);
+    const [isDead, setIsDead] = useState(false);
 
     const updatePlayers = useCallback(() => {
         instance.put(update, {
@@ -162,6 +164,11 @@ const Game = () => {
         }).then((response) => {
             setPlayers(response.data.players);
             setCurrentPlayer(response.data.currentPlayer);
+            for (const player of response.data.players) {
+                if (player.username === username && player.life <= 0) {
+                    setIsDead(true);
+                }
+            }
         }).catch((error) => {
             console.error(error);
         });
@@ -187,6 +194,8 @@ const Game = () => {
             lobbyId: lobbyId
         }).then(() => {
             updatePlayers();
+            setAsDraw(false);
+            setFocusedCard(-1);
         }).catch((error) => {
             console.error(error);
         });
@@ -340,6 +349,7 @@ const Game = () => {
                             setSliderValue={setSliderValue}
                             asDraw={asDraw}
                             setAsDraw={setAsDraw}
+                            isDead={isDead}
                         />
                     </Box>
                 </Box>
@@ -389,9 +399,9 @@ const Game = () => {
                                     onClick={() => setTarget(username)}
                                 >
                                     <Typography variant="h6" style={{color: 'white'}}>
-                                        {username || 'null'}
+                                        { username || 'null' }
                                         <br />
-                                        🔥 {life || 'null'}
+                                        🔥 { life > 0 ? life : 'mort' }
                                     </Typography>
                                 </Button>
                             );
@@ -441,6 +451,38 @@ const Game = () => {
                             sliderValue,
                             setIsQuestion
                         )}>Répondre</Button>
+                    </Box>
+                </Modal>
+                <Modal open={isDead} onClose={() => {}} disableEscapeKeyDown disableBackdropClick>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: 400,
+                            bgcolor: 'white',
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: '10px',
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Typography variant="h6" component="h2">
+                                Vous êtes mort.
+                            </Typography>
+                            <IconButton color="inherit" onClick={() => {
+                                window.location.href = '/';
+                            }}>
+                                <HomeIcon />
+                            </IconButton>
+                        </Box>
                     </Box>
                 </Modal>
             </Box>
