@@ -216,7 +216,7 @@ const Game = () => {
                         <Button
                             key={index}
                             style={{
-                                backgroundImage: `url(${cardsImages[index]})`,
+                                backgroundImage: `url(${cardsImages[parseInt(card) - 1]})`,
                                 backgroundSize: 'contain',
                                 backgroundPosition: 'center',
                                 backgroundRepeat: 'no-repeat',
@@ -243,7 +243,7 @@ const Game = () => {
                         <Button
                             key={index+2}
                             style={{
-                                backgroundImage: `url(${cardsImages[index+2]})`,
+                                backgroundImage: `url(${cardsImages[parseInt(card) - 1]})`,
                                 backgroundSize: 'contain',
                                 backgroundPosition: 'center',
                                 backgroundRepeat: 'no-repeat',
