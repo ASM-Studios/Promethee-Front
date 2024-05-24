@@ -75,7 +75,7 @@ export default function App() {
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/rules" element={<Rules />} />
-                        <Route path="/game" element={<Game />} />
+                        <Route path="/game/*" element={<Game />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                 </BrowserRouter>

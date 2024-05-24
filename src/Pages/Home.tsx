@@ -19,10 +19,11 @@ const Actions = () => {
             username: username,
             lobbyId: lobbyId
         }).then((response) => {
+            setCards([]);
             setPlayers(response.data.players);
             setLobbyId(response.data.lobbyId);
             setLobbyCreator(response.data.creator);
-            window.location.href = '/game';
+            window.location.href = '/game/' + lobbyId;
         }).catch((error) => {
             console.error(error);
         });
